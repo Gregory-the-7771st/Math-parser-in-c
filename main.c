@@ -111,7 +111,7 @@ int findHead(struct Token tokens[], size) {
         printf("Error while parsing operation: Nothing to the left of operator");
         exit(1);
     }
-    
+
     if (tokens[size - 1].type == 0) {
         printf("Error while parsing operation: Nothing to the right of operator");
         exit(1);
@@ -146,7 +146,7 @@ int findHead(struct Token tokens[], size) {
             }
         }
     }
-    
+
     if (head == -1) {
         if (debug) {
             printf("size: %i\n", size);
@@ -159,48 +159,39 @@ int findHead(struct Token tokens[], size) {
                 for (int j = 1; j < size - 1; j++) {
                     bracket[j - 1] = tokens[j];
                 }
-                return findHead(bracket, size - 2) + 1;
+                return findHead(bracket, size - 2);
             } else {
                 printf("Error while parsing operation: Unable to find head node");
                 exit(1);
             }
         }
     }
-    
+
     return head;
-}    
+}
 
 struct Node parse(struct Token tokens[], int size) {
-    if (debug) {
-        for (int i = 0; i < size; i++) {
-            printf("i: %i, tokens[i].value: %s, tokens[i].type = %i\n", i, tokens[i].value, tokens[i].type);
-        }
+    if ((size == 1 || size == 2) && tokens[0].type == 1) {
+        printf("Error while parsing operation: Missing operand");
+        exit(1);
     }
-    
+
     int headIndex = findHead(tokens, size);
-    
+
     if (tokens[0].type == 2 && tokens[size - 1].type == 2) {
         for (int i = 1; i < size - 1; i++) {
-            printf("%s, ", tokens[i].value);
             tokens[i - 1] = tokens[i];
-            printf("%s\n", tokens[i].value);
-            size -= 2;
         }
+        size -= 2;
+        return parse(tokens, size);
     }
-    
-    if (debug) {
-        printf("headIndex: %i, tokens[headIndex].value: %s\n", headIndex, tokens[headIndex].value);
-    }
+
     struct Node head;
     head.type = tokens[headIndex].type;
     strcpy(head.value, tokens[headIndex].value);
     head.left = NULL;
     head.right = NULL;
-    
-    if (debug) {
-        printf("made node\n");
-    }
-    
+
     if (size != 1) {
         struct Token leftTokens[headIndex];
         for (int i = 0; i < headIndex; i++) {
@@ -209,11 +200,7 @@ struct Node parse(struct Token tokens[], int size) {
         struct Node left = parse(leftTokens, headIndex);
         head.left = &left;
     }
-    
-    if (debug) {
-        printf("made left node\n");
-    }
-    
+
     if (size != 1) {
         struct Token rightTokens[size - headIndex];
         for (int i = headIndex + 1; i < size; i++) {
@@ -222,27 +209,19 @@ struct Node parse(struct Token tokens[], int size) {
         struct Node right = parse(rightTokens, size - headIndex - 1);
         head.right = &right;
     }
-    
-    if (debug) {
-        printf("made right node\n");
-    }
-    
-    if (debug) {
-        printf("head.value: %s", head.value);
-        if (head.left == NULL) {
-            printf("\n");
-        } else {
-            printf(" head.left -> value: %s\n", head.left -> value);
-        }
-    }
-    
+
     return head;
+}
+
+float evaluate(node) {
+    //will make later :3
 }
 
 int main() {
     printf("Operation: ");
     fgets(input, sizeof(input), stdin);
     tokenize();
-    parse(tokens, tokensLen);
+    node = parse(tokens, tokensLen);
+    printf("Result: %.2f");
     return 0;
 }
