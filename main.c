@@ -51,7 +51,7 @@ void tokenize() {
     for (int i = 0; i < strlen(input) - 1; i++) { // - 1 for the \n at the end
         char character = input[i];
         setToken = false;
-        if (isNum(character) && isOperation(character)) {
+        if (isNum(character) && isOperation(character)) { // + or -
             if (i == 0 || tokens[tokensLen - 1].type == 0) {
                 currType = 1;
                 char string[2] = {character, '\0'};
@@ -87,15 +87,18 @@ void tokenize() {
             exit(1);
         }
 
-        if (setToken || i == strlen(input) - 2) {
+        if (setToken || i == strlen(input) - 2) { // the last thing is for checking if it is the last character of the input
+        
             if (strlen(currTok) > 10) {
                 printf("Error while tokenizing input: Token too large (above 10 characters)");
                 exit(1);
             }
+            
             if (tokensLen == 20) {
                 printf("Error while tokenizing input: Too many tokens (above 20 tokens)");
                 exit(1);
             }
+            
             struct Token token;
             token.type = currType;
             strcpy(token.value, currTok);
@@ -148,9 +151,6 @@ int findHead(struct Token tokens[], size) {
     }
 
     if (head == -1) {
-        if (debug) {
-            printf("size: %i\n", size);
-        }
         if (size == 1) {
             head = 0;
         } else {
@@ -171,7 +171,7 @@ int findHead(struct Token tokens[], size) {
 }
 
 struct Node parse(struct Token tokens[], int size) {
-    if ((size == 1 || size == 2) && tokens[0].type == 1) {
+    if (size == 2 && tokens[0].type == 1) {
         printf("Error while parsing operation: Missing operand");
         exit(1);
     }
@@ -213,8 +213,8 @@ struct Node parse(struct Token tokens[], int size) {
     return head;
 }
 
-float evaluate(node) {
-    //will make later :3
+float evaluate(struct Node node) {
+    // will make later :3
 }
 
 int main() {
@@ -222,6 +222,6 @@ int main() {
     fgets(input, sizeof(input), stdin);
     tokenize();
     node = parse(tokens, tokensLen);
-    printf("Result: %.2f");
+    printf("Result: %.2f", evaluate(node));
     return 0;
 }
