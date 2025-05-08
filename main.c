@@ -19,6 +19,11 @@ struct Node node;
 char input[100];
 int tokensLen = 0;
 bool debug = true;
+// so that the pointers in the node dont cease to be valid as soon as the parse function is exited
+struct Node lefts[20];
+struct Node rights[20];
+int leftIndex = 0;
+int rightIndex = 0;
 
 bool hasHigherPrecende(value) {
     return value == '*' || value == '/' || value == '(' || value == ')';
@@ -171,7 +176,7 @@ int findHead(struct Token tokens[], size) {
 }
 
 struct Node parse(struct Token tokens[], int size) {
-    if (size == 2 && tokens[0].type == 1) {
+    if (size == 2 && (tokens[0].type == 1 || tokens[1].type == 1)) {
         printf("Error while parsing operation: Missing operand");
         exit(1);
     }
@@ -198,7 +203,9 @@ struct Node parse(struct Token tokens[], int size) {
             leftTokens[i] = tokens[i];
         }
         struct Node left = parse(leftTokens, headIndex);
-        head.left = &left;
+        lefts[leftIndex] = left;
+        head.left = &lefts[leftIndex];
+        leftIndex++;
     }
 
     if (size != 1) {
@@ -207,14 +214,46 @@ struct Node parse(struct Token tokens[], int size) {
             rightTokens[i - headIndex - 1] = tokens[i];
         }
         struct Node right = parse(rightTokens, size - headIndex - 1);
-        head.right = &right;
+        rights[rightIndex] = right;
+        head.right = &rights[rightIndex];
+        rightIndex++;
     }
-
+    
     return head;
 }
 
-float evaluate(struct Node node) {
-    // will make later :3
+char evaluate(struct Node node) {
+    char result[10];
+    
+    if (debug) {
+        printf("value: %s, left: %s, right: %s\n", node.value, node.left -> value, node.right -> value);
+    }
+    if (node.left -> type == 0 && node.right -> type == 0) {
+        //later
+    } else if (node.left -> type != 0 && node.right -> type == 0) {
+        //later
+    } else if (node.left -> type == 0 && node.right -> type != 0) {
+        //later
+    } else {
+        if (node.type == 0) {
+            if (node.value[0] == '+') {
+                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(&(node.left -> value), NULL) + strtof(&(node.right -> value), NULL));
+            } else if (node.value[0] == '-') {
+                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(&(node.left -> value), NULL) - strtof(&(node.right -> value), NULL));
+            } else if (node.value[0] == '*') {
+                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(&(node.left -> value), NULL) * strtof(&(node.right -> value), NULL));
+            } else if (node.value[0] == '/') {
+                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(&(node.left -> value), NULL) / strtof(&(node.right -> value), NULL));
+            }
+        } else {
+            printf("Error while evaluating expression: Nodes that are numbers cannot have left or right nodes");
+            exit(1);
+        }
+    }
+    if (debug) {
+        printf("the result variable: %s\n", result);
+    }
+    return result;
 }
 
 int main() {
@@ -222,6 +261,8 @@ int main() {
     fgets(input, sizeof(input), stdin);
     tokenize();
     node = parse(tokens, tokensLen);
-    printf("Result: %.2f", evaluate(node));
+    char result[10];
+    strcpy(result, evaluate(node));
+    printf("Result: %s", result);
     return 0;
 }
