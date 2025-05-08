@@ -18,6 +18,7 @@ struct Token tokens[20];
 struct Node node;
 char input[100];
 int tokensLen = 0;
+char result[10];
 bool debug = true;
 // so that the pointers in the node dont cease to be valid as soon as the parse function is exited
 struct Node lefts[20];
@@ -93,17 +94,17 @@ void tokenize() {
         }
 
         if (setToken || i == strlen(input) - 2) { // the last thing is for checking if it is the last character of the input
-        
+
             if (strlen(currTok) > 10) {
                 printf("Error while tokenizing input: Token too large (above 10 characters)");
                 exit(1);
             }
-            
+
             if (tokensLen == 20) {
                 printf("Error while tokenizing input: Too many tokens (above 20 tokens)");
                 exit(1);
             }
-            
+
             struct Token token;
             token.type = currType;
             strcpy(token.value, currTok);
@@ -218,22 +219,68 @@ struct Node parse(struct Token tokens[], int size) {
         head.right = &rights[rightIndex];
         rightIndex++;
     }
-    
+
     return head;
 }
 
 char evaluate(struct Node node) {
-    char result[10];
-    
-    if (debug) {
-        printf("value: %s, left: %s, right: %s\n", node.value, node.left -> value, node.right -> value);
-    }
     if (node.left -> type == 0 && node.right -> type == 0) {
-        //later
+        evaluate(*node.left);
+        char left[10];
+        strcpy(left, result);
+        evaluate(*node.right);
+        char right[10];
+        strcpy(right, result);
+        if (node.type == 0) {
+            if (node.value[0] == '+') {
+                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(left, NULL) + strtof(right, NULL));
+            } else if (node.value[0] == '-') {
+                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(left, NULL) - strtof(right, NULL));
+            } else if (node.value[0] == '*') {
+                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(left, NULL) * strtof(right, NULL));
+            } else if (node.value[0] == '/') {
+                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(left, NULL) / strtof(right, NULL));
+            }
+        } else {
+            printf("Error while evaluating expression: Nodes that are numbers cannot have left or right nodes");
+            exit(1);
+        }
     } else if (node.left -> type != 0 && node.right -> type == 0) {
-        //later
+        evaluate(*node.right);
+        char right[10];
+        strcpy(right, result);
+        if (node.type == 0) {
+            if (node.value[0] == '+') {
+                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(&(node.left -> value), NULL) + strtof(right, NULL));
+            } else if (node.value[0] == '-') {
+                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(&(node.left -> value), NULL) - strtof(right, NULL));
+            } else if (node.value[0] == '*') {
+                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(&(node.left -> value), NULL) * strtof(right, NULL));
+            } else if (node.value[0] == '/') {
+                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(&(node.left -> value), NULL) / strtof(right, NULL));
+            }
+        } else {
+            printf("Error while evaluating expression: Nodes that are numbers cannot have left or right nodes");
+            exit(1);
+        }
     } else if (node.left -> type == 0 && node.right -> type != 0) {
-        //later
+        evaluate(*node.left);
+        char left[10];
+        strcpy(left, result);
+        if (node.type == 0) {
+            if (node.value[0] == '+') {
+                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(left, NULL) + strtof(&(node.right -> value), NULL));
+            } else if (node.value[0] == '-') {
+                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(left, NULL) - strtof(&(node.right -> value), NULL));
+            } else if (node.value[0] == '*') {
+                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(left, NULL) * strtof(&(node.right -> value), NULL));
+            } else if (node.value[0] == '/') {
+                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(left, NULL) / strtof(&(node.right -> value), NULL));
+            }
+        } else {
+            printf("Error while evaluating expression: Nodes that are numbers cannot have left or right nodes");
+            exit(1);
+        }
     } else {
         if (node.type == 0) {
             if (node.value[0] == '+') {
@@ -250,9 +297,6 @@ char evaluate(struct Node node) {
             exit(1);
         }
     }
-    if (debug) {
-        printf("the result variable: %s\n", result);
-    }
     return result;
 }
 
@@ -261,8 +305,7 @@ int main() {
     fgets(input, sizeof(input), stdin);
     tokenize();
     node = parse(tokens, tokensLen);
-    char result[10];
-    strcpy(result, evaluate(node));
+    evaluate(node);
     printf("Result: %s", result);
     return 0;
 }
