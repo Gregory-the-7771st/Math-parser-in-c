@@ -1,1 +1,1 @@
-it doesnt work yet im still coding it up (see description) 
+This was made for personal use only, and I specifically tried to figure out most things by myself (up to a reasonable limit of course), so naturally it's not too optimized. The goal of this project was to make me learn c and it definitely accomplished that! If you are gonna use this, note that only +, -, *, / are supported as operations. Parantheses work too. It doesnt depend on spacing so things like 2++2 will work aswell. If you find a bug go make your own version idk
