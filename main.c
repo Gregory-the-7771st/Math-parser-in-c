@@ -18,8 +18,7 @@ struct Token tokens[20];
 struct Node node;
 char input[100];
 int tokensLen = 0;
-char result[10];
-bool debug = true;
+char result[10]; // so that i can print the result from evaluate(), printing the return value causes a segfault idk why
 // so that the pointers in the node dont cease to be valid as soon as the parse function is exited
 struct Node lefts[20];
 struct Node rights[20];
@@ -40,7 +39,7 @@ bool isNum(char c) {
     return false;
 }
 
-bool isOperation(char c) {
+bool isOperator(char c) {
     char operations[6] = {'+', '-', '/', '*', '(', ')'};
     for (int i = 0; i < 6; i++) {
         if (c == operations[i]) {
@@ -54,14 +53,18 @@ void tokenize() {
     char currTok[10] = "";
     int currType = -1;
     bool setToken = false;
+    bool tokenHasDot = false;
     for (int i = 0; i < strlen(input) - 1; i++) { // - 1 for the \n at the end
         char character = input[i];
         setToken = false;
-        if (isNum(character) && isOperation(character)) { // + or -
+        if (isNum(character) && isOperator(character)) { // + or -
             if (i == 0 || tokens[tokensLen - 1].type == 0) {
+                if (currTok[0] == '+' || currTok[0] == '-') {
+                    printf("Error while tokenizing input: Number has + or - at the wrong place");
+                    exit(1);
+                }
                 currType = 1;
-                char string[2] = {character, '\0'};
-                strcat(currTok, string);
+                currTok[strlen(currTok)] = character; // set the next character
             } else {
                 currType = 0;
                 char string[2] = {character, '\0'};
@@ -69,20 +72,26 @@ void tokenize() {
                 setToken = true;
             }
         } else if (isNum(character)) {
-            if (isOperation(input[i + 1])) {
+            if (isOperator(input[i + 1])) {
                 setToken = true;
             }
+            if (character == '.' || character == ',') {
+                if (tokenHasDot || i == strlen(input) - 1 || i == 0) {
+                    printf("Error while tokenizing input: Number has too many dots or one in an impossible place");
+                    exit(1);
+                } else {
+                    tokenHasDot = true;
+                }
+            }
             currType = 1;
-            char string[2] = {character, '\0'};
-            strcat(currTok, string);
-        } else if (isOperation(character)) {
+            currTok[strlen(currTok)] = character;
+        } else if (isOperator(character)) {
             if (character == '(' || character == ')') {
                 currType = 2;
             } else {
                 currType = 0;
             }
-            char string[2] = {character, '\0'};
-            strcat(currTok, string);
+            currTok[strlen(currTok)] = character;
             setToken = true;
         } else if (character == ' ') {
             if (input[i - 1] != ' ' && strlen(currTok) > 0) {
@@ -104,7 +113,7 @@ void tokenize() {
                 printf("Error while tokenizing input: Too many tokens (above 20 tokens)");
                 exit(1);
             }
-
+            
             struct Token token;
             token.type = currType;
             strcpy(token.value, currTok);
@@ -112,6 +121,17 @@ void tokenize() {
             tokensLen++;
             strcpy(currTok, "");
         }
+    }
+    
+    // typing just a number (or + or -) would lead to a segfault, so i did this
+    if (tokensLen == 1 && tokens[0].type == 1) {
+        if (!(strlen(tokens[0].value) == 1 && (tokens[0].value[0] == '+' || tokens[0].value[0] == '-'))) {
+            printf("Result: %s", tokens[0].value);
+            exit(0);
+       } else if (strlen(tokens[0].value) == 1 && (tokens[0].value[0] == '+' || tokens[0].value[0] == '-')) {
+           printf("Error while tokenizing function: Missing operands");
+           exit(1);
+       }
     }
 }
 
@@ -178,13 +198,13 @@ int findHead(struct Token tokens[], size) {
 
 struct Node parse(struct Token tokens[], int size) {
     if (size == 2 && (tokens[0].type == 1 || tokens[1].type == 1)) {
-        printf("Error while parsing operation: Missing operand");
+        printf("Error while parsing operation: Missing operator or operand");
         exit(1);
     }
 
     int headIndex = findHead(tokens, size);
 
-    if (tokens[0].type == 2 && tokens[size - 1].type == 2) {
+    if (tokens[0].type == 2 && tokens[size - 1].type == 2) { // there are brackets surrounding the tokens, so we just remove them 
         for (int i = 1; i < size - 1; i++) {
             tokens[i - 1] = tokens[i];
         }
@@ -219,7 +239,7 @@ struct Node parse(struct Token tokens[], int size) {
         head.right = &rights[rightIndex];
         rightIndex++;
     }
-
+    
     return head;
 }
 
