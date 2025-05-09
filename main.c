@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 
@@ -25,7 +26,7 @@ struct Node rights[20];
 int leftIndex = 0;
 int rightIndex = 0;
 
-bool hasHigherPrecende(value) {
+bool hasHigherPrecende(char value) {
     return value == '*' || value == '/' || value == '(' || value == ')';
 }
 
@@ -135,7 +136,7 @@ void tokenize() {
     }
 }
 
-int findHead(struct Token tokens[], size) {
+int findHead(struct Token tokens[], int size) {
     if (tokens[0].type == 0) {
         printf("Error while parsing operation: Nothing to the left of operator");
         exit(1);
