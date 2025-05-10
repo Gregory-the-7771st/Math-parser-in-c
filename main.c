@@ -254,13 +254,13 @@ char evaluate(struct Node node) {
         strcpy(right, result);
         if (node.type == 0) {
             if (node.value[0] == '+') {
-                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(left, NULL) + strtof(right, NULL));
+                snprintf(result, 10 * sizeof(char), "%.2f", strtof(left, NULL) + strtof(right, NULL));
             } else if (node.value[0] == '-') {
-                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(left, NULL) - strtof(right, NULL));
+                snprintf(result, 10 * sizeof(char), "%.2f", strtof(left, NULL) - strtof(right, NULL));
             } else if (node.value[0] == '*') {
-                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(left, NULL) * strtof(right, NULL));
+                snprintf(result, 10 * sizeof(char), "%.2f", strtof(left, NULL) * strtof(right, NULL));
             } else if (node.value[0] == '/') {
-                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(left, NULL) / strtof(right, NULL));
+                snprintf(result, 10 * sizeof(char), "%.2f", strtof(left, NULL) / strtof(right, NULL));
             }
         } else {
             printf("Error while evaluating expression: Nodes that are numbers cannot have left or right nodes");
@@ -272,13 +272,13 @@ char evaluate(struct Node node) {
         strcpy(right, result);
         if (node.type == 0) {
             if (node.value[0] == '+') {
-                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(&(node.left -> value), NULL) + strtof(right, NULL));
+                snprintf(result, 10 * sizeof(char), "%.2f", strtof(node.left -> value, NULL) + strtof(right, NULL));
             } else if (node.value[0] == '-') {
-                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(&(node.left -> value), NULL) - strtof(right, NULL));
+                snprintf(result, 10 * sizeof(char), "%.2f", strtof(node.left -> value, NULL) - strtof(right, NULL));
             } else if (node.value[0] == '*') {
-                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(&(node.left -> value), NULL) * strtof(right, NULL));
+                snprintf(result, 10 * sizeof(char), "%.2f", strtof(node.left -> value, NULL) * strtof(right, NULL));
             } else if (node.value[0] == '/') {
-                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(&(node.left -> value), NULL) / strtof(right, NULL));
+                snprintf(result, 10 * sizeof(char), "%.2f", strtof(node.left -> value, NULL) / strtof(right, NULL));
             }
         } else {
             printf("Error while evaluating expression: Nodes that are numbers cannot have left or right nodes");
@@ -290,13 +290,13 @@ char evaluate(struct Node node) {
         strcpy(left, result);
         if (node.type == 0) {
             if (node.value[0] == '+') {
-                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(left, NULL) + strtof(&(node.right -> value), NULL));
+                snprintf(result, 10 * sizeof(char), "%.2f", strtof(left, NULL) + strtof(node.right -> value, NULL));
             } else if (node.value[0] == '-') {
-                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(left, NULL) - strtof(&(node.right -> value), NULL));
+                snprintf(result, 10 * sizeof(char), "%.2f", strtof(left, NULL) - strtof(node.right -> value, NULL));
             } else if (node.value[0] == '*') {
-                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(left, NULL) * strtof(&(node.right -> value), NULL));
+                snprintf(result, 10 * sizeof(char), "%.2f", strtof(left, NULL) * strtof(node.right -> value, NULL));
             } else if (node.value[0] == '/') {
-                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(left, NULL) / strtof(&(node.right -> value), NULL));
+                snprintf(result, 10 * sizeof(char), "%.2f", strtof(left, NULL) / strtof(node.right -> value, NULL));
             }
         } else {
             printf("Error while evaluating expression: Nodes that are numbers cannot have left or right nodes");
@@ -305,20 +305,19 @@ char evaluate(struct Node node) {
     } else {
         if (node.type == 0) {
             if (node.value[0] == '+') {
-                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(&(node.left -> value), NULL) + strtof(&(node.right -> value), NULL));
+                snprintf(result, 10 * sizeof(char), "%.2f", strtof(node.left -> value, NULL) + strtof(node.right -> value, NULL));
             } else if (node.value[0] == '-') {
-                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(&(node.left -> value), NULL) - strtof(&(node.right -> value), NULL));
+                snprintf(result, 10 * sizeof(char), "%.2f", strtof(node.left -> value, NULL) - strtof(node.right -> value, NULL));
             } else if (node.value[0] == '*') {
-                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(&(node.left -> value), NULL) * strtof(&(node.right -> value), NULL));
+                snprintf(result, 10 * sizeof(char), "%.2f", strtof(node.left -> value, NULL) * strtof(node.right -> value, NULL));
             } else if (node.value[0] == '/') {
-                snprintf(&result, 10 * sizeof(char), "%.2f", strtof(&(node.left -> value), NULL) / strtof(&(node.right -> value), NULL));
+                snprintf(result, 10 * sizeof(char), "%.2f", strtof(node.left -> value, NULL) / strtof(node.right -> value, NULL));
             }
         } else {
             printf("Error while evaluating expression: Nodes that are numbers cannot have left or right nodes");
             exit(1);
         }
     }
-    return result;
 }
 
 int main() {
