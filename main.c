@@ -244,7 +244,7 @@ struct Node parse(struct Token tokens[], int size) {
     return head;
 }
 
-char evaluate(struct Node node) {
+void evaluate(struct Node node) {
     if (node.left -> type == 0 && node.right -> type == 0) {
         evaluate(*node.left);
         char left[10];
