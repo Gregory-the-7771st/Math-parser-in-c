@@ -198,19 +198,15 @@ int findHead(struct Token tokens[], int size) {
 }
 
 struct Node parse(struct Token tokens[], int size) {
-    if (size == 2 && (tokens[0].type == 1 || tokens[1].type == 1)) {
+    if (size == 2) {
         printf("Error while parsing operation: Missing operator or operand");
         exit(1);
     }
 
     int headIndex = findHead(tokens, size);
 
-    if (tokens[0].type == 2 && tokens[size - 1].type == 2) { // there are brackets surrounding the tokens, so we just remove them 
-        for (int i = 1; i < size - 1; i++) {
-            tokens[i - 1] = tokens[i];
-        }
-        size -= 2;
-        return parse(tokens, size);
+    if (tokens[0].type == 2 && tokens[size - 1].type == 2) { // there are brackets surrounding the tokens
+        return parse((&tokens[1]), size - 2); // pointer stuff to get the array starting at the 2nd item, since size is 2 less it will ignore the item at the end
     }
 
     struct Node head;
@@ -228,9 +224,7 @@ struct Node parse(struct Token tokens[], int size) {
         lefts[leftIndex] = left;
         head.left = &lefts[leftIndex];
         leftIndex++;
-    }
-
-    if (size != 1) {
+        
         struct Token rightTokens[size - headIndex];
         for (int i = headIndex + 1; i < size; i++) {
             rightTokens[i - headIndex - 1] = tokens[i];
@@ -245,78 +239,39 @@ struct Node parse(struct Token tokens[], int size) {
 }
 
 void evaluate(struct Node node) {
+    float left;
+    float right;
     if (node.left -> type == 0 && node.right -> type == 0) {
         evaluate(*node.left);
-        char left[10];
-        strcpy(left, result);
+        left = strtof(result, NULL);
         evaluate(*node.right);
-        char right[10];
-        strcpy(right, result);
-        if (node.type == 0) {
-            if (node.value[0] == '+') {
-                snprintf(result, 10 * sizeof(char), "%.2f", strtof(left, NULL) + strtof(right, NULL));
-            } else if (node.value[0] == '-') {
-                snprintf(result, 10 * sizeof(char), "%.2f", strtof(left, NULL) - strtof(right, NULL));
-            } else if (node.value[0] == '*') {
-                snprintf(result, 10 * sizeof(char), "%.2f", strtof(left, NULL) * strtof(right, NULL));
-            } else if (node.value[0] == '/') {
-                snprintf(result, 10 * sizeof(char), "%.2f", strtof(left, NULL) / strtof(right, NULL));
-            }
-        } else {
-            printf("Error while evaluating expression: Nodes that are numbers cannot have left or right nodes");
-            exit(1);
-        }
+        right = strtof(result, NULL);
     } else if (node.left -> type != 0 && node.right -> type == 0) {
+        left = strtof(node.left -> value, NULL);
         evaluate(*node.right);
-        char right[10];
-        strcpy(right, result);
-        if (node.type == 0) {
-            if (node.value[0] == '+') {
-                snprintf(result, 10 * sizeof(char), "%.2f", strtof(node.left -> value, NULL) + strtof(right, NULL));
-            } else if (node.value[0] == '-') {
-                snprintf(result, 10 * sizeof(char), "%.2f", strtof(node.left -> value, NULL) - strtof(right, NULL));
-            } else if (node.value[0] == '*') {
-                snprintf(result, 10 * sizeof(char), "%.2f", strtof(node.left -> value, NULL) * strtof(right, NULL));
-            } else if (node.value[0] == '/') {
-                snprintf(result, 10 * sizeof(char), "%.2f", strtof(node.left -> value, NULL) / strtof(right, NULL));
-            }
-        } else {
-            printf("Error while evaluating expression: Nodes that are numbers cannot have left or right nodes");
-            exit(1);
-        }
+        right = strtof(result, NULL);
     } else if (node.left -> type == 0 && node.right -> type != 0) {
         evaluate(*node.left);
-        char left[10];
-        strcpy(left, result);
-        if (node.type == 0) {
-            if (node.value[0] == '+') {
-                snprintf(result, 10 * sizeof(char), "%.2f", strtof(left, NULL) + strtof(node.right -> value, NULL));
-            } else if (node.value[0] == '-') {
-                snprintf(result, 10 * sizeof(char), "%.2f", strtof(left, NULL) - strtof(node.right -> value, NULL));
-            } else if (node.value[0] == '*') {
-                snprintf(result, 10 * sizeof(char), "%.2f", strtof(left, NULL) * strtof(node.right -> value, NULL));
-            } else if (node.value[0] == '/') {
-                snprintf(result, 10 * sizeof(char), "%.2f", strtof(left, NULL) / strtof(node.right -> value, NULL));
-            }
-        } else {
-            printf("Error while evaluating expression: Nodes that are numbers cannot have left or right nodes");
-            exit(1);
+        left = strtof(result, NULL);
+        right = strtof(node.right -> value, NULL);
+    } else {
+        left = strtof(node.left -> value, NULL);
+        right = strtof(node.right -> value, NULL);
+    }
+    
+    if (node.type == 0) {
+        if (node.value[0] == '+') {
+            snprintf(result, 10 * sizeof(char), "%.2f", left + right);
+        } else if (node.value[0] == '-') {
+            snprintf(result, 10 * sizeof(char), "%.2f", left - right);
+        } else if (node.value[0] == '*') {
+            snprintf(result, 10 * sizeof(char), "%.2f", left * right);
+        } else if (node.value[0] == '/') {
+            snprintf(result, 10 * sizeof(char), "%.2f", left / right);
         }
     } else {
-        if (node.type == 0) {
-            if (node.value[0] == '+') {
-                snprintf(result, 10 * sizeof(char), "%.2f", strtof(node.left -> value, NULL) + strtof(node.right -> value, NULL));
-            } else if (node.value[0] == '-') {
-                snprintf(result, 10 * sizeof(char), "%.2f", strtof(node.left -> value, NULL) - strtof(node.right -> value, NULL));
-            } else if (node.value[0] == '*') {
-                snprintf(result, 10 * sizeof(char), "%.2f", strtof(node.left -> value, NULL) * strtof(node.right -> value, NULL));
-            } else if (node.value[0] == '/') {
-                snprintf(result, 10 * sizeof(char), "%.2f", strtof(node.left -> value, NULL) / strtof(node.right -> value, NULL));
-            }
-        } else {
-            printf("Error while evaluating expression: Nodes that are numbers cannot have left or right nodes");
-            exit(1);
-        }
+        printf("Error while evaluating expression: Nodes that are numbers cannot have left or right nodes");
+        exit(1);
     }
 }
 
